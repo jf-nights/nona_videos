@@ -7,28 +7,27 @@ require 'date'
 
 Encoding.default_internal = "UTF-8"
 
-    def get_img(date)
-      uri = date.strftime("http://www.xnxx.com/cartoon_of_the_day/cartoons/%Y/%Y-%m-%d-cartoon.htm")
-      charset = nil
-      html = open(uri) do |f|
-        charset = f.charset
-        f.read
-      end
-      doc = Nokogiri::HTML.parse(html, nil, charset)
+def get_img(date)
+  uri = date.strftime("http://www.xnxx.com/cartoon_of_the_day/cartoons/%Y/%Y-%m-%d-cartoon.htm")
+  charset = nil
+  html = open(uri) do |f|
+    charset = f.charset
+    f.read
+  end
+  doc = Nokogiri::HTML.parse(html, nil, charset)
 
-      arr = []
-      arr << uri
-      arr << doc.xpath('//img').attribute('src').value
-      arr << doc.xpath('//img').attribute('alt').value
-      return arr
-    end
+  arr = []
+  arr << uri
+  arr << doc.xpath('//img').attribute('src').value
+  arr << doc.xpath('//img').attribute('alt').value
+  return arr
+end
 
-    def send(arr, m)
-      arr.each do |str|
-        m.channel.send(str)
-      end
-    end
-
+def send(arr, m)
+  arr.each do |str|
+    m.channel.send(str)
+  end
+end
 
 bot = Cinch::Bot.new do
   configure do |c|
@@ -43,7 +42,7 @@ bot = Cinch::Bot.new do
   on :message do |m|
     input = m.message
     if input =~ /^#today$/
-      arr = get_img(Date.today)
+      arr = get_img(Time.now.utc)
       send(arr, m)
 
     elsif input =~ /^#random$/
@@ -54,8 +53,5 @@ bot = Cinch::Bot.new do
 
     end
   end
-
-
-
 end
 bot.start
